@@ -15,7 +15,4 @@ public interface AccountRepository extends JpaRepository<AccountEntity, Long>
 
     // Find accounts assigned to a specific field
     List<AccountEntity> findByFieldId(Long fieldId);
-    
-    // Find accounts assigned to a specific farm
-    List<AccountEntity> findByFarmId(Long farmId);
 }

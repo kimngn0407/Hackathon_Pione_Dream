@@ -114,26 +114,25 @@ public class AlertService {
         Warning_thresholdEntity threshold = thresholdOpt.get();
         double value = data.getValue();
         double min, max;
-        String messages = "Cảnh báo cảm biến ";
-        String sensorTypeVi = "";
+        String messages = "Alert for sensor ";
         switch (sensor.getType()) {
             case "Temperature":
                 if (threshold.getMinTemperature() == null || threshold.getMaxTemperature() == null) return alerts;
                 min = threshold.getMinTemperature();
                 max = threshold.getMaxTemperature();
-                sensorTypeVi = "Nhiệt độ";
+                messages += "Temperature";
                 break;
             case "Humidity":
                 if (threshold.getMinHumidity() == null || threshold.getMaxHumidity() == null) return alerts;
                 min = threshold.getMinHumidity();
                 max = threshold.getMaxHumidity();
-                sensorTypeVi = "Độ ẩm";
+                messages += "Humidity";
                 break;
             case "Soil Moisture":
                 if (threshold.getMinSoilMoisture() == null || threshold.getMaxSoilMoisture() == null) return alerts;
                 min = threshold.getMinSoilMoisture();
                 max = threshold.getMaxSoilMoisture();
-                sensorTypeVi = "Độ ẩm đất";
+                messages += "Soil Moisture";
                 break;
             default:
                 return alerts;
@@ -150,24 +149,6 @@ public class AlertService {
             status = "Good";
         }
 
-        // Tạo thông điệp tiếng Việt
-        String statusVi = status.equals("Critical") ? "Nguy hiểm" : 
-                         (status.equals("Warning") ? "Cảnh báo" : "Bình thường");
-        
-        String detailMessage = "";
-        if (value > max) {
-            detailMessage = String.format("%s vượt quá ngưỡng tối đa (%.1f > %.1f)", 
-                sensorTypeVi, value, max);
-        } else if (value < min) {
-            detailMessage = String.format("%s thấp hơn ngưỡng tối thiểu (%.1f < %.1f)", 
-                sensorTypeVi, value, min);
-        } else {
-            detailMessage = String.format("%s trong ngưỡng cho phép (%.1f - %.1f)", 
-                sensorTypeVi, min, max);
-        }
-        
-        messages = sensorTypeVi + " - " + statusVi + ": " + detailMessage;
-
         AlertEntity alert = new AlertEntity();
         alert.setSensor(sensor);
         alert.setField(field);
@@ -177,105 +158,73 @@ public class AlertService {
         alert.setThresholdMax(max);
         alert.setTimestamp(LocalDateTime.now());
         alert.setStatus(status);
-        alert.setMessage(messages);
+        alert.setMessage(messages+ status);
 
         alert.setGroupType("s");
         alert.setOwnerId(sensor.getId());
 
         alertRepository.save(alert);
 
-        // Send email notification for Critical and Warning alerts
+        // If alert is critical, send email notification (non-blocking) to farm owner and field-related users
         try {
             String s = status == null ? "" : status.toString();
-            // Send email for both Critical and Warning status
-            if (s.equalsIgnoreCase("critical") || s.equalsIgnoreCase("warning")) {
-                String emailStatusVi = s.equalsIgnoreCase("critical") ? "KHẨN CẤP" : "CẢNH BÁO";
-                String subject = "[SmartFarm] " + emailStatusVi + ": " + sensorTypeVi + " - " + field.getFieldName();
+            if (s.equalsIgnoreCase("critical")) {
+                // build a simple HTML body
+                String subject = "[SmartFarm] Critical Alert: " + alert.getType();
+        // HTML body is generated from Thymeleaf template below via model
 
-                // Collect recipients: farm owner + farm users + field users with roles FARMER/TECHNICIAN/FARM_OWNER
+                // collect recipients: farm owner + field-assigned accounts with roles FARMER/TECHNICIAN/FARM_OWNER
                 java.util.Set<String> recipients = new java.util.HashSet<>();
 
-                // 1. Add farm owner email
                 if (field.getFarm() != null && field.getFarm().getOwner() != null) {
                     String ownerEmail = field.getFarm().getOwner().getEmail();
-                    if (ownerEmail != null && !ownerEmail.isEmpty()) {
-                        recipients.add(ownerEmail);
-                    }
+                    if (ownerEmail != null && !ownerEmail.isEmpty()) recipients.add(ownerEmail);
                 }
 
-                // 2. Find and add accounts assigned to this farm
-                if (field.getFarm() != null) {
-                    try {
-                        java.util.List<com.example.demo.Entities.AccountEntity> farmAccounts = 
-                            accountRepository.findByFarmId(field.getFarm().getId());
-                        for (com.example.demo.Entities.AccountEntity acc : farmAccounts) {
-                            if (acc == null || acc.getEmail() == null || acc.getEmail().isEmpty()) continue;
-                            // Check if user has relevant roles
-                            if (acc.getRoles() != null) {
-                                for (com.example.demo.DTO.Role r : acc.getRoles()) {
-                                    if (r == com.example.demo.DTO.Role.FARMER || 
-                                        r == com.example.demo.DTO.Role.TECHNICIAN || 
-                                        r == com.example.demo.DTO.Role.FARM_OWNER) {
-                                        recipients.add(acc.getEmail());
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    } catch (Exception exFarmAccounts) {
-                        System.err.println("Failed to lookup farm accounts: " + exFarmAccounts.getMessage());
-                    }
-                }
-
-                // 3. Find and add accounts assigned to this specific field
+                // find accounts assigned to this field
                 try {
-                    java.util.List<com.example.demo.Entities.AccountEntity> fieldAccounts = 
-                        accountRepository.findByFieldId(field.getId());
-                    for (com.example.demo.Entities.AccountEntity acc : fieldAccounts) {
-                        if (acc == null || acc.getEmail() == null || acc.getEmail().isEmpty()) continue;
-                        // Check if user has relevant roles
+                    java.util.List<com.example.demo.Entities.AccountEntity> accounts = accountRepository.findByFieldId(field.getId());
+                    for (com.example.demo.Entities.AccountEntity acc : accounts) {
+                        if (acc == null) continue;
+                        if (acc.getEmail() == null) continue;
+                        // check roles
                         if (acc.getRoles() != null) {
                             for (com.example.demo.DTO.Role r : acc.getRoles()) {
-                                if (r == com.example.demo.DTO.Role.FARMER || 
-                                    r == com.example.demo.DTO.Role.TECHNICIAN || 
-                                    r == com.example.demo.DTO.Role.FARM_OWNER) {
+                                if (r == com.example.demo.DTO.Role.FARMER || r == com.example.demo.DTO.Role.TECHNICIAN || r == com.example.demo.DTO.Role.FARM_OWNER) {
                                     recipients.add(acc.getEmail());
                                     break;
                                 }
                             }
                         }
                     }
-                } catch (Exception exFieldAccounts) {
-                    System.err.println("Failed to lookup field accounts: " + exFieldAccounts.getMessage());
+                } catch (Exception exAccounts) {
+                    // log and continue
+                    System.err.println("Failed to lookup field accounts: " + exAccounts.getMessage());
                 }
 
-                // Send email if there are recipients
-                if (!recipients.isEmpty()) {
-                    java.util.List<String> toList = new java.util.ArrayList<>(recipients);
-                    java.util.Map<String, Object> model = new java.util.HashMap<>();
-                    model.put("templateName", "alert-email");
-                    model.put("fieldName", field.getFieldName());
-                    model.put("farmName", field.getFarm() != null ? field.getFarm().getFarmName() : "");
-                    model.put("sensorName", sensor.getSensorName());
-                    model.put("type", alert.getType());
-                    model.put("value", alert.getValue());
-                    model.put("thresholdMin", alert.getThresholdMin());
-                    model.put("thresholdMax", alert.getThresholdMax());
-                    model.put("timestamp", alert.getTimestamp());
-                    model.put("message", alert.getMessage());
-                    model.put("status", alert.getStatus());
+                // send a single email with multiple recipients (To list)
+                java.util.List<String> toList = new java.util.ArrayList<>(recipients);
+                java.util.Map<String, Object> model = new java.util.HashMap<>();
+                model.put("templateName", "alert-email");
+                model.put("fieldName", field.getFieldName());
+                model.put("farmName", field.getFarm() != null ? field.getFarm().getFarmName() : "");
+                model.put("sensorName", sensor.getSensorName());
+                model.put("type", alert.getType());
+                model.put("value", alert.getValue());
+                model.put("thresholdMin", alert.getThresholdMin());
+                model.put("thresholdMax", alert.getThresholdMax());
+                model.put("timestamp", alert.getTimestamp());
+                model.put("message", alert.getMessage());
+                model.put("status", alert.getStatus());
 
-                    try {
-                        emailService.sendAlertEmail(toList, null, null, subject, model);
-                        System.out.println("Alert email sent to " + recipients.size() + " recipient(s): " + String.join(", ", toList));
-                    } catch (Exception exSend) {
-                        System.err.println("Failed to send alert email: " + exSend.getMessage());
-                    }
-                } else {
-                    System.out.println("No recipients found for alert notification");
+                try {
+                    emailService.sendAlertEmail(toList, null, null, subject, model);
+                } catch (Exception exSend) {
+                    System.err.println("Failed to send alert email (batch): " + exSend.getMessage());
                 }
             }
         } catch (Exception ex) {
+            // log and continue
             System.err.println("Failed to process alert email sending: " + ex.getMessage());
         }
 
