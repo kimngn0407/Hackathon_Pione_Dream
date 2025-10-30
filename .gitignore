@@ -1,0 +1,74 @@
+# Node modules
+node_modules/
+J2EE_Frontend/node_modules/
+AI_SmartFarm_CHatbot/node_modules/
+AI_SmartFarm_CHatbot/.next/
+
+# Build outputs
+J2EE_Frontend/build/
+AI_SmartFarm_CHatbot/.next/
+AI_SmartFarm_CHatbot/out/
+demoSmartFarm/demo/target/
+
+# Python virtual environments
+RecommentCrop/.venv/
+PestAndDisease/.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment files (keep .env.example)
+.env
+.env.local
+.env.production
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Model files (optional - nếu model quá lớn)
+# *.pth
+# *.pkl
+
+# Large archive files
+*.zip
+*.rar
+*.7z
+*.tar.gz
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+
+# Test files
+test_data.json
+TEST_CROP_API.bat
+**/test_*.py
+**/debug_*.py
+**/inspect_*.py
+**/*_test.py
+**/check_*.py
+
+# Backup files
+*.backup
+
+# TypeScript build info
+tsconfig.tsbuildinfo
+
+# BAT files (local development) - Uncomment nếu không muốn push
+# *.bat
+# !CLEANUP.bat
