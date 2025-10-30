@@ -2,6 +2,7 @@ package com.example.demo.Controllers;
 
 import com.example.demo.Services.EmailService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,10 +14,12 @@ import java.util.Map;
 /**
  * Controller for testing email functionality
  * Use this to verify email configuration before deploying to production
+ * Only enabled when spring.mail.host is configured
  */
 @RestController
 @RequestMapping("/api/email/test")
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "spring.mail.host")
 public class EmailTestController {
 
     private final EmailService emailService;

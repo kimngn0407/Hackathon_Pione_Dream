@@ -4,7 +4,7 @@ import com.example.demo.DTO.AlertResponseDTO;
 import com.example.demo.DTO.SensorDataLastestDTO;
 import com.example.demo.Entities.*;
 import com.example.demo.Repositories.*;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -14,16 +14,32 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class AlertService {
 
     private final SensorRepository sensorRepository;
     private final AccountRepository accountRepository;
     private final Warning_thresholdRepository thresholdRepository;
     private final AlertRepository alertRepository;
-    private final EmailService emailService;
+    
+    @Autowired(required = false)
+    private EmailService emailService;
+    
     private final CropSeasonRepository cropSeasonRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    
+    public AlertService(SensorRepository sensorRepository,
+                       AccountRepository accountRepository,
+                       Warning_thresholdRepository thresholdRepository,
+                       AlertRepository alertRepository,
+                       CropSeasonRepository cropSeasonRepository,
+                       SimpMessagingTemplate messagingTemplate) {
+        this.sensorRepository = sensorRepository;
+        this.accountRepository = accountRepository;
+        this.thresholdRepository = thresholdRepository;
+        this.alertRepository = alertRepository;
+        this.cropSeasonRepository = cropSeasonRepository;
+        this.messagingTemplate = messagingTemplate;
+    }
 
     // ✅ Get all alerts for statistics
     public List<AlertEntity> getAllAlerts() {
@@ -218,7 +234,11 @@ public class AlertService {
                 model.put("status", alert.getStatus());
 
                 try {
-                    emailService.sendAlertEmail(toList, null, null, subject, model);
+                    if (emailService != null) {
+                        emailService.sendAlertEmail(toList, null, null, subject, model);
+                    } else {
+                        System.out.println("Email service not configured, skipping alert email");
+                    }
                 } catch (Exception exSend) {
                     System.err.println("Failed to send alert email (batch): " + exSend.getMessage());
                 }
