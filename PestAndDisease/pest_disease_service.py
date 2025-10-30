@@ -262,7 +262,7 @@ if __name__ == '__main__':
         logger.info("  - POST /api/detect       - Phát hiện sâu bệnh")
         logger.info("  - GET  /api/classes      - Danh sách bệnh")
         
-        port = int(os.environ.get('PORT', 5001))
+        port = int(os.environ.get('PORT', 7860))
         app.run(host='0.0.0.0', port=port, debug=False)
     else:
         logger.error("Không thể khởi động service do lỗi load model")
