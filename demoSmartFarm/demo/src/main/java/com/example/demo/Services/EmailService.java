@@ -2,9 +2,9 @@ package com.example.demo.Services;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -17,13 +17,15 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@RequiredArgsConstructor
 public class EmailService {
 
     private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
-    private final JavaMailSender mailSender;
-    private final SpringTemplateEngine templateEngine;
+    @Autowired(required = false)
+    private JavaMailSender mailSender;
+    
+    @Autowired
+    private SpringTemplateEngine templateEngine;
 
     @Value("${app.mail.from:alerts@example.com}")
     private String fromAddress;
@@ -35,6 +37,10 @@ public class EmailService {
 
     @Async
     public void sendAlertEmail(List<String> to, List<String> cc, List<String> bcc, String subject, Map<String, Object> templateVariables) {
+        if (mailSender == null) {
+            logger.warn("Email service is not configured. Skipping email to: {}", to);
+            return;
+        }
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
