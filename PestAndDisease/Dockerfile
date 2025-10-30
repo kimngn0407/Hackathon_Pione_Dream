@@ -8,10 +8,12 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for better caching
-COPY requirements-cpu.txt requirements.txt
+COPY requirements.txt .
 
-# Install Python dependencies with CPU-only PyTorch (lighter)
-RUN pip install --no-cache-dir -r requirements.txt --index-url https://download.pytorch.org/whl/cpu
+# Install Python dependencies
+# Install non-PyTorch packages first, then PyTorch from CPU index
+RUN pip install --no-cache-dir flask flask-cors pillow numpy timm && \
+    pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu
 
 # Copy application files
 COPY . .
