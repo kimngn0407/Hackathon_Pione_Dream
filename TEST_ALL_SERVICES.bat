@@ -1,64 +1,84 @@
 @echo off
 chcp 65001 >nul
-echo ========================================
-echo 🧪 TEST ALL SMART FARM SERVICES
-echo ========================================
+echo.
+echo ╔════════════════════════════════════════════════════════════╗
+echo ║           TEST TẤT CẢ SERVICES - SMART FARM                ║
+echo ╚════════════════════════════════════════════════════════════╝
 echo.
 
-echo 📝 Nhập các URL của bạn:
+echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+echo 🔍 1. TEST BACKEND (RAILWAY)
+echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+echo.
+echo Testing: https://hackathonpionedream-production.up.railway.app/actuator/health
+echo.
+curl -s https://hackathonpionedream-production.up.railway.app/actuator/health
+echo.
 echo.
 
-set /p BACKEND_URL="Backend Railway URL (vd: https://xxx.railway.app): "
-set /p CHATBOT_URL="Chatbot Vercel URL (vd: https://xxx.vercel.app): "
-
+echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+echo 🤖 2. TEST CHATBOT (VERCEL)
+echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 echo.
-echo ========================================
-echo 🚀 BẮT ĐẦU TEST...
-echo ========================================
+echo Testing: https://hackathon-pione-dream-vzj5.vercel.app/
+echo Status: Opening in browser...
+start https://hackathon-pione-dream-vzj5.vercel.app/
 echo.
 
-REM Test 1: Pest & Disease AI (Hugging Face)
-echo [1/4] 🌾 Testing Pest ^& Disease AI...
+echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+echo 🐛 3. TEST PEST AI (HUGGING FACE)
+echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+echo.
+echo Testing: https://kimngan0407-pest-disease.hf.space/health
+echo.
 curl -s https://kimngan0407-pest-disease.hf.space/health
 echo.
 echo.
 
-REM Test 2: Backend API
-echo [2/4] 🔧 Testing Backend API...
-if not "%BACKEND_URL%"=="" (
-    curl -s %BACKEND_URL%/api/health
-    echo.
-) else (
-    echo ⚠️ Backend URL not provided, skipping...
-)
+echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+echo 🌾 4. TEST CROP AI (RENDER)
+echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 echo.
-
-REM Test 3: Get Pest Classes
-echo [3/4] 📋 Getting Pest Classes...
-curl -s https://kimngan0407-pest-disease.hf.space/api/classes
+echo Testing: https://hackathon-pione-dream.onrender.com/health
+echo.
+curl -s https://hackathon-pione-dream.onrender.com/health
 echo.
 echo.
 
-REM Test 4: Chatbot
-echo [4/4] 🤖 Chatbot URL:
-if not "%CHATBOT_URL%"=="" (
-    echo ✅ %CHATBOT_URL%
-    echo 👉 Mở trong trình duyệt để test
-) else (
-    echo ⚠️ Chatbot URL not provided
-)
+echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+echo 🌐 5. TEST FRONTEND (VERCEL)
+echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+echo.
+echo Testing: https://hackathon-pione-dream.vercel.app/
+echo Status: Opening in browser...
+start https://hackathon-pione-dream.vercel.app/
 echo.
 
-echo ========================================
-echo ✅ TEST COMPLETED!
-echo ========================================
+echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+echo 🔑 6. TEST LOGIN
+echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 echo.
-echo 📊 SUMMARY:
-echo - Pest AI:  https://kimngan0407-pest-disease.hf.space
-echo - Backend:  %BACKEND_URL%
-echo - Chatbot:  %CHATBOT_URL%
+echo Testing login with admin@smartfarm.com...
 echo.
-echo 🔍 Kiểm tra output ở trên để xem service nào hoạt động!
+curl -s -X POST https://hackathonpionedream-production.up.railway.app/api/auth/login ^
+  -H "Content-Type: application/json" ^
+  -d "{\"email\":\"admin@smartfarm.com\",\"password\":\"123456\"}"
+echo.
+echo.
+
+echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+echo ✅ TEST COMPLETED
+echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+echo.
+echo 📝 Results Summary:
+echo.
+echo ✅ Backend: Check output above for {"status":"UP"}
+echo ✅ Chatbot: Browser should open
+echo ✅ Pest AI: Check output for {"status":"healthy"}
+echo ✅ Crop AI: Check output for {"status":"healthy"}
+echo ✅ Frontend: Browser should open
+echo ✅ Login: Check output for token
+echo.
+echo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 echo.
 pause
-
