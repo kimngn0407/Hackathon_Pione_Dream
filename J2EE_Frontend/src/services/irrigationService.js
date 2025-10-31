@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api.config';
 
 const getAuthHeader = () => {
     const token = localStorage.getItem('token');
@@ -6,7 +7,7 @@ const getAuthHeader = () => {
 };
 
 // API endpoints - Using correct backend endpoints with full URL
-const API_BASE = 'http://localhost:8080/api';
+const API_BASE = `${API_BASE_URL}/api`;
 
 // Core irrigation functions - using correct backend endpoints
 const logIrrigation = (data) => 

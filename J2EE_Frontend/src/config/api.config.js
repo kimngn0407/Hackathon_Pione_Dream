@@ -22,6 +22,9 @@ const getApiBaseUrl = () => {
 // Export the API base URL
 export const API_BASE_URL = getApiBaseUrl();
 
+// WebSocket URL (wss for secure HTTPS connection, ws for HTTP)
+export const WS_BASE_URL = API_BASE_URL.replace('https://', 'wss://').replace('http://', 'ws://');
+
 // Export API endpoints
 export const API_ENDPOINTS = {
   // Authentication

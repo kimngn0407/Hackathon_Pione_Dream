@@ -1,7 +1,9 @@
 /**
  * WebSocket Service for Real-time Alerts
- * Connects to backend WebSocket at ws://localhost:8080/ws
+ * Connects to backend WebSocket
  */
+
+import { WS_BASE_URL } from '../config/api.config';
 
 class WebSocketService {
   constructor() {
@@ -18,8 +20,8 @@ class WebSocketService {
    * @param {Function} onMessageCallback - Callback when receiving alert message
    */
   connect(onMessageCallback) {
-    // Backend WebSocket URL
-    const wsUrl = 'ws://localhost:8080/ws';
+    // Backend WebSocket URL (wss for production, ws for local)
+    const wsUrl = `${WS_BASE_URL}/ws`;
 
     try {
       this.socket = new WebSocket(wsUrl);
