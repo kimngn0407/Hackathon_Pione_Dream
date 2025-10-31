@@ -3,7 +3,9 @@
  * Service để gọi API gợi ý cây trồng từ ML model
  */
 
-const API_BASE_URL = 'http://localhost:8080/api/crop-recommendation';
+import { API_ENDPOINTS } from '../config/api.config';
+
+const API_BASE_URL = API_ENDPOINTS.CROP.RECOMMEND.replace('/recommend', '');
 
 const cropRecommendationService = {
   /**

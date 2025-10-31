@@ -3,7 +3,9 @@
  * Service để tương tác với API phát hiện sâu bệnh
  */
 
-const API_BASE_URL = 'http://localhost:8080/api/pest-disease';
+import { API_ENDPOINTS } from '../config/api.config';
+
+const API_BASE_URL = API_ENDPOINTS.PEST_DISEASE;
 
 export const pestDiseaseService = {
   /**
@@ -11,7 +13,7 @@ export const pestDiseaseService = {
    */
   async checkHealth() {
     try {
-      const response = await fetch(`${API_BASE_URL}/health`);
+      const response = await fetch(API_BASE_URL.HEALTH);
       const data = await response.json();
       return data;
     } catch (error) {
@@ -25,7 +27,7 @@ export const pestDiseaseService = {
    */
   async getDiseaseClasses() {
     try {
-      const response = await fetch(`${API_BASE_URL}/classes`);
+      const response = await fetch(API_BASE_URL.CLASSES);
       const data = await response.json();
       return data;
     } catch (error) {
@@ -62,7 +64,7 @@ export const pestDiseaseService = {
       formData.append('image', imageFile);
 
       // Call API
-      const response = await fetch(`${API_BASE_URL}/detect`, {
+      const response = await fetch(API_BASE_URL.DETECT, {
         method: 'POST',
         body: formData,
       });

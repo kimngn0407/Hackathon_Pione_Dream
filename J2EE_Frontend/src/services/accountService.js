@@ -6,6 +6,8 @@
 
 // Import axios cho HTTP requests
 import axios from 'axios';
+// Import API configuration
+import { API_ENDPOINTS } from '../config/api.config';
 
 /**
  * Helper function để clear authentication tokens từ localStorage
@@ -62,7 +64,7 @@ const createSimpleToken = (email) => {
  * @returns {Promise} Axios response promise
  */
 export const register = async (data) => {
-  return axios.post(`/api/accounts/register`, data);
+  return axios.post(API_ENDPOINTS.AUTH.REGISTER, data);
 };
 
 /**
@@ -79,7 +81,7 @@ export const register = async (data) => {
  * @returns {Promise} Axios response promise
  */
 export const login = async (data) => {
-  const response = await axios.post(`/api/accounts/login`, data);
+  const response = await axios.post(API_ENDPOINTS.AUTH.LOGIN, data);
   
   // Backend returns JWT token và personalInfo
   if (response.data && response.data.token && response.data.personalInfo) {
