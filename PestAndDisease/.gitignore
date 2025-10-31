@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docs và test files không cần
+*.md
+!README.md
+*.bat
+test_*.py
+debug_*.py
+inspect_*.py
+
+# Config files không dùng cho HF
+railway.toml
+Procfile
+render.yaml
+requirements-cpu.txt
+
