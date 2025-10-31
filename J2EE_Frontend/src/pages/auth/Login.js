@@ -72,7 +72,23 @@ const Login = () => {
     } catch (err) {
       console.error('❌ Login error:', err);
       console.error('Error response:', err.response);
-      setError(err.response?.data || err.message || 'Đăng nhập thất bại! Vui lòng kiểm tra lại email hoặc mật khẩu.');
+      
+      // Parse error message properly
+      let errorMessage = 'Đăng nhập thất bại! Vui lòng kiểm tra lại email hoặc mật khẩu.';
+      
+      if (err.response?.data) {
+        const errorData = err.response.data;
+        // Check if error data is an object with error property
+        if (typeof errorData === 'object' && errorData.error) {
+          errorMessage = errorData.error;
+        } else if (typeof errorData === 'string') {
+          errorMessage = errorData;
+        }
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
