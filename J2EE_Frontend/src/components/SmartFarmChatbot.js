@@ -9,14 +9,15 @@ import CloseIcon from '@mui/icons-material/Close';
 import MinimizeIcon from '@mui/icons-material/Minimize';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import AgricultureIcon from '@mui/icons-material/Agriculture';
+import { API_ENDPOINTS } from '../config/api.config';
 
 const SmartFarmChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   
-  // URL của chatbot (chạy trên port 9002)
-  const CHATBOT_URL = 'http://localhost:9002';
+  // URL của chatbot (Production)
+  const CHATBOT_URL = API_ENDPOINTS.DIRECT.CHATBOT;
 
   // Detect mobile screen
   useEffect(() => {

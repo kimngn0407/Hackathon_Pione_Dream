@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api.config';
+
 const getAuthHeader = () => {
     const token = localStorage.getItem('token');
     return token ? { Authorization: `Bearer ${token}` } : {};
@@ -18,12 +20,12 @@ const validateCoordinates = (coordinates) => {
     );
 };
 
-export const getFieldsByFarm = (farmId) => axios.get(`/api/fields/${farmId}/field`, { headers: getAuthHeader() });
-export const getFieldCoordinates = (fieldId) => axios.get(`/api/coordinates?fieldId=${fieldId}`, { headers: getAuthHeader() });
+export const getFieldsByFarm = (farmId) => axios.get(`${API_BASE_URL}/api/fields/${farmId}/field`, { headers: getAuthHeader() });
+export const getFieldCoordinates = (fieldId) => axios.get(`${API_BASE_URL}/api/coordinates?fieldId=${fieldId}`, { headers: getAuthHeader() });
 
 const getAllFields = async () => {
     try {
-        const response = await axios.get('/api/fields', { headers: getAuthHeader() });
+        const response = await axios.get(`${API_BASE_URL}/api/fields`, { headers: getAuthHeader() });
 
         return response;
     } catch (error) {

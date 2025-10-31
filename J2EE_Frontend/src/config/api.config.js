@@ -61,6 +61,23 @@ export const API_ENDPOINTS = {
     HEALTH: `${API_BASE_URL}/api/crop/health`,
   },
   
+  // Direct AI Services (bypass backend)
+  DIRECT: {
+    // Chatbot
+    CHATBOT: 'https://hackathon-pione-dream-vzj5.vercel.app',
+    
+    // Pest & Disease AI (direct)
+    PEST_AI: 'https://kimngan0407-pest-disease.hf.space',
+    PEST_HEALTH: 'https://kimngan0407-pest-disease.hf.space/health',
+    PEST_DETECT: 'https://kimngan0407-pest-disease.hf.space/api/detect',
+    PEST_CLASSES: 'https://kimngan0407-pest-disease.hf.space/api/classes',
+    
+    // Crop Recommendation AI (direct)
+    CROP_AI: 'https://hackathon-pione-dream.onrender.com',
+    CROP_AI_HEALTH: 'https://hackathon-pione-dream.onrender.com/health',
+    CROP_AI_RECOMMEND: 'https://hackathon-pione-dream.onrender.com/api/recommend',
+  },
+  
   // Alerts
   ALERTS: {
     BASE: `${API_BASE_URL}/api/alerts`,
