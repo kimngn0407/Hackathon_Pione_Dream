@@ -12,8 +12,8 @@ echo.
 
 set "PG_PATH="
 
-REM Check all common PostgreSQL versions (16 to 11)
-for %%v in (16 15 14 13 12 11) do (
+REM Check all common PostgreSQL versions (17 to 11)
+for %%v in (17 16 15 14 13 12 11) do (
     if exist "C:\Program Files\PostgreSQL\%%v\bin\pg_dump.exe" (
         set "PG_PATH=C:\Program Files\PostgreSQL\%%v\bin"
         echo ✅ Tìm thấy PostgreSQL %%v
