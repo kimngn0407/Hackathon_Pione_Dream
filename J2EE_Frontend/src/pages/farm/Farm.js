@@ -106,11 +106,12 @@ const Farm = () => {
         setLoading(true);
         try {
             const response = await farmService.getFarms();
-            const farmsWithStats = await Promise.all(response.data.map(async (farm) => {
+            const farms = Array.isArray(response.data) ? response.data : [];
+            const farmsWithStats = await Promise.all(farms.map(async (farm) => {
                 try {
                     // Lấy danh sách field của farm
                     const fieldsResponse = await fieldService.getFieldsByFarm(farm.id);
-                    const fields = fieldsResponse.data || [];
+                    const fields = Array.isArray(fieldsResponse.data) ? fieldsResponse.data : [];
 
                     let sensorCount = 0;
                     let alertCount = 0;
@@ -119,13 +120,15 @@ const Farm = () => {
                     await Promise.all(fields.map(async (field) => {
                         try {
                             const sensorsResponse = await sensorService.getSensorsByField(field.id);
-                            sensorCount += sensorsResponse.data.length;
+                            const sensors = Array.isArray(sensorsResponse.data) ? sensorsResponse.data : [];
+                            sensorCount += sensors.length;
                         } catch (e) {
                  
                         }
                         try {
                             const alertsResponse = await alertService.getAlertsByField(field.id);
-                            alertCount += alertsResponse.data.length;
+                            const alerts = Array.isArray(alertsResponse.data) ? alertsResponse.data : [];
+                            alertCount += alerts.length;
                         } catch (e) {
                 
                         }

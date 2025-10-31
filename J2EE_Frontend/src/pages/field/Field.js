@@ -240,7 +240,8 @@ const Field = () => {
     const loadFarmsList = async () => {
         try {
             const response = await farmService.getFarms();
-            const sortedFarms = response.data.sort((a, b) => a.id - b.id);
+            const farms = Array.isArray(response.data) ? response.data : [];
+            const sortedFarms = farms.sort((a, b) => a.id - b.id);
             setFarmsList(sortedFarms);
         } catch (error) {
             console.error("Error loading farms list:", error);

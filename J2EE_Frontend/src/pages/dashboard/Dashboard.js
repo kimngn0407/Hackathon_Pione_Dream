@@ -111,13 +111,18 @@ const Dashboard = () => {
       try {
         // 1. Lấy tất cả farms
         const farmsResponse = await farmService.getFarms();
-        const farms = farmsResponse.data;
+        const farms = Array.isArray(farmsResponse.data) ? farmsResponse.data : [];
+        
+        if (farms.length === 0) {
+          console.warn('⚠️ No farms found in database');
+        }
+        
         farmNamesArr = farms.map(f => f.farmName);
         
         // 2. Lấy TẤT CẢ SENSORS 1 LẦN (thay vì từng field)
         try {
           const allSensorsResponse = await sensorService.getSensorList();
-          totalSensors = allSensorsResponse.length || 0;
+          totalSensors = Array.isArray(allSensorsResponse) ? allSensorsResponse.length : 0;
           console.log('✅ Total sensors:', totalSensors);
         } catch (sensorError) {
           console.error('❌ Error fetching sensors:', sensorError);
@@ -125,37 +130,45 @@ const Dashboard = () => {
         }
         
         // 3. Lấy tất cả fields của tất cả farms
-        await Promise.all(farms.map(async (farm) => {
+        if (farms.length > 0) {
+          await Promise.all(farms.map(async (farm) => {
           try {
             const fieldsResponse = await fieldService.getFieldsByFarm(farm.id);
-            allFields = allFields.concat(fieldsResponse.data);
+            const fields = Array.isArray(fieldsResponse.data) ? fieldsResponse.data : [];
+            allFields = allFields.concat(fields);
           } catch (error) {
             console.error('Error fetching fields for farm', farm.id, error);
           }
         }));
+        }
         
         // 4. Lấy trạng thái từng field và đếm alerts
-        await Promise.all(allFields.map(async (field) => {
-          try {
-            const fieldDetailResponse = await fieldService.getFieldById(field.id);
-            const fieldDetail = fieldDetailResponse.data;
-            
-            // Đếm trạng thái
-            if (fieldDetail.status === 'GOOD') fieldStatusCounts.Good++;
-            else if (fieldDetail.status === 'WARNING') fieldStatusCounts.Warning++;
-            else if (fieldDetail.status === 'CRITICAL') fieldStatusCounts.Critical++;
-            
-            // Đếm alerts
+        if (allFields.length > 0) {
+          await Promise.all(allFields.map(async (field) => {
             try {
-              const alertsResponse = await alertService.getAlertsByField(field.id);
-              totalAlerts += alertsResponse.data.length;
-            } catch (alertError) {
-              console.error('Error fetching alerts for field', field.id, alertError);
+              const fieldDetailResponse = await fieldService.getFieldById(field.id);
+              const fieldDetail = fieldDetailResponse.data;
+              
+              // Đếm trạng thái
+              if (fieldDetail && fieldDetail.status) {
+                if (fieldDetail.status === 'GOOD') fieldStatusCounts.Good++;
+                else if (fieldDetail.status === 'WARNING') fieldStatusCounts.Warning++;
+                else if (fieldDetail.status === 'CRITICAL') fieldStatusCounts.Critical++;
+              }
+              
+              // Đếm alerts
+              try {
+                const alertsResponse = await alertService.getAlertsByField(field.id);
+                const alerts = Array.isArray(alertsResponse.data) ? alertsResponse.data : [];
+                totalAlerts += alerts.length;
+              } catch (alertError) {
+                console.error('Error fetching alerts for field', field.id, alertError);
+              }
+            } catch (error) {
+              console.error('Error fetching field detail', field.id, error);
             }
-          } catch (error) {
-            console.error('Error fetching field detail', field.id, error);
-          }
-        }));
+          }));
+        }
         
         // 5. Lấy nhiệt độ Đà Lạt
         await fetchDalatTemperature();

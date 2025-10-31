@@ -80,7 +80,7 @@ const CropManager = () => {
         // Get all plants first, then get flat stages for each plant
         cropService.getCropsByField()
             .then(response => {
-                const plants = response.data;
+                const plants = Array.isArray(response.data) ? response.data : [];
                 console.log('All plants:', plants);
                 
                 // Get flat stages for all plants
@@ -88,7 +88,7 @@ const CropManager = () => {
                     cropService.getFlatStagesByPlantId(plant.id)
                         .then(stagesResponse => ({
                             plant: plant,
-                            stages: stagesResponse.data
+                            stages: Array.isArray(stagesResponse.data) ? stagesResponse.data : []
                         }))
                         .catch(error => {
                             console.warn(`No stages found for plant ${plant.id}:`, error);
